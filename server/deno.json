@@ -1,0 +1,18 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-read --allow-sys --watch src/index.ts",
+    "start": "deno run --allow-net --allow-env --allow-read --allow-sys src/index.ts"
+  },
+  "imports": {
+    "@trpc/server": "npm:@trpc/server@^10.45.0",
+    "zod": "npm:zod@^3.22.4",
+    "mongoose": "npm:mongoose@^8.1.1",
+    "stripe": "npm:stripe@^17.7.0",
+    "jsonwebtoken": "npm:jsonwebtoken@^9.0.2",
+    "google-auth-library": "npm:google-auth-library@^9.15.1",
+    "@shared/": "../shared/"
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom"]
+  }
+}

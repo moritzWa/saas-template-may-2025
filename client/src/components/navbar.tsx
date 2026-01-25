@@ -1,32 +1,47 @@
 import { Menu } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 
 export function Navbar() {
-  const location = useLocation();
-  const isAuthenticated = !!localStorage.getItem('accessToken');
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check auth status on client side only
+  useEffect(() => {
+    setIsAuthenticated(!!localStorage.getItem('accessToken'));
+  }, []);
 
   const NavLinks = () => (
     <>
       <Link
-        to="/blog"
-        className={`hover:text-primary transition-colors ${location.pathname === '/blog' || location.pathname.startsWith('/blog/') ? 'text-primary font-medium' : ''}`}
+        href="/blog"
+        className={`hover:text-primary transition-colors ${
+          router.pathname === '/blog' || router.pathname.startsWith('/blog/')
+            ? 'text-primary font-medium'
+            : ''
+        }`}
       >
         Blog
       </Link>
 
       {isAuthenticated ? (
         <Link
-          to="/home"
-          className={`hover:text-primary transition-colors ${location.pathname === '/home' ? 'text-primary font-medium' : ''}`}
+          href="/home"
+          className={`hover:text-primary transition-colors ${
+            router.pathname === '/home' ? 'text-primary font-medium' : ''
+          }`}
         >
           Dashboard
         </Link>
       ) : (
         <Link
-          to="/login"
-          className={`hover:text-primary transition-colors ${location.pathname === '/login' ? 'text-primary font-medium' : ''}`}
+          href="/login"
+          className={`hover:text-primary transition-colors ${
+            router.pathname === '/login' ? 'text-primary font-medium' : ''
+          }`}
         >
           Login
         </Link>
@@ -38,7 +53,7 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center justify-between w-full">
-          <Link to="/" className="text-xl font-bold mr-8">
+          <Link href="/" className="text-xl font-bold mr-8">
             PROJECT_NAME
           </Link>
 

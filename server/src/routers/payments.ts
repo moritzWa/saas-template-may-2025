@@ -1,16 +1,16 @@
 import Stripe from 'stripe';
 import { z } from 'zod';
-import { User as UserModel } from '../models/user';
-import { publicProcedure, router } from '../trpc';
-import { verifyToken } from './auth';
+import { User as UserModel } from '../models/user.ts';
+import { publicProcedure, router } from '../trpc.ts';
+import { verifyToken } from './auth.ts';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-02-24.acacia',
-});
+const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
+const stripe = stripeKey
+  ? new Stripe(stripeKey, { apiVersion: '2025-02-24.acacia' })
+  : null;
 
-const PRICE_ID = process.env.STRIPE_PRICE_ID || '';
+const PRICE_ID = Deno.env.get('STRIPE_PRICE_ID') || '';
 
-// Define return types for better type inference
 interface CheckoutSessionResponse {
   url: string | null;
 }
@@ -23,6 +23,7 @@ export const paymentsRouter = router({
   createCheckoutSession: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }): Promise<CheckoutSessionResponse> => {
+      if (!stripe) throw new Error('Stripe not configured');
       try {
         const decoded = verifyToken(input.token);
         const user = await UserModel.findById(decoded.userId);
@@ -57,8 +58,8 @@ export const paymentsRouter = router({
             },
           ],
           mode: 'subscription',
-          success_url: `${process.env.CLIENT_URL}/settings?success=true`,
-          cancel_url: `${process.env.CLIENT_URL}/settings?canceled=true`,
+          success_url: `${Deno.env.get('CLIENT_URL')}/settings?success=true`,
+          cancel_url: `${Deno.env.get('CLIENT_URL')}/settings?canceled=true`,
         });
 
         return { url: session.url };
@@ -71,6 +72,7 @@ export const paymentsRouter = router({
   createPortalSession: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }): Promise<PortalSessionResponse> => {
+      if (!stripe) throw new Error('Stripe not configured');
       try {
         const decoded = verifyToken(input.token);
         const user = await UserModel.findById(decoded.userId);
@@ -81,57 +83,13 @@ export const paymentsRouter = router({
 
         const portalSession = await stripe.billingPortal.sessions.create({
           customer: user.stripeCustomerId,
-          return_url: `${process.env.CLIENT_URL}/settings`,
+          return_url: `${Deno.env.get('CLIENT_URL')}/settings`,
         });
 
         return { url: portalSession.url };
       } catch (error) {
         console.error('Portal session error:', error);
         throw new Error('Failed to create portal session');
-      }
-    }),
-
-  handleWebhook: publicProcedure
-    .input(
-      z.object({
-        signature: z.string(),
-        rawBody: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      try {
-        const event = stripe.webhooks.constructEvent(
-          input.rawBody,
-          input.signature,
-          process.env.STRIPE_WEBHOOK_SECRET || ''
-        );
-
-        if (event.type === 'checkout.session.completed') {
-          const session = event.data.object as Stripe.Checkout.Session;
-          const customerId = session.customer as string;
-
-          const user = await UserModel.findOne({ stripeCustomerId: customerId });
-          if (user) {
-            user.hasSubscription = true;
-            await user.save();
-          }
-        }
-
-        if (event.type === 'customer.subscription.deleted') {
-          const subscription = event.data.object as Stripe.Subscription;
-          const customerId = subscription.customer as string;
-
-          const user = await UserModel.findOne({ stripeCustomerId: customerId });
-          if (user) {
-            user.hasSubscription = false;
-            await user.save();
-          }
-        }
-
-        return { received: true };
-      } catch (error) {
-        console.error('Webhook error:', error);
-        throw new Error('Webhook handler failed');
       }
     }),
 });

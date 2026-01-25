@@ -1,13 +1,13 @@
-import { User } from '@shared/types';
+import { User } from '@shared/types.ts';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
-import { User as UserModel } from '../models/user';
-import { publicProcedure, router } from '../trpc';
+import { User as UserModel } from '../models/user.ts';
+import { publicProcedure, router } from '../trpc.ts';
 
 const googleClient = new OAuth2Client(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET
+  Deno.env.get('GOOGLE_CLIENT_ID'),
+  Deno.env.get('GOOGLE_CLIENT_SECRET')
 );
 
 export interface ExportUsageResponse {
@@ -20,13 +20,12 @@ export interface ExportUsageResponse {
 // Helper function to verify token and return user ID
 export function verifyToken(token: string): { userId: string } {
   try {
-    const decoded = jwt.verify(token, process.env.AUTH_SECRET || 'fallback-secret') as {
+    const decoded = jwt.verify(token, Deno.env.get('AUTH_SECRET') || 'fallback-secret') as {
       userId: string;
     };
     return decoded;
   } catch (error) {
     console.error('Token verification error:', error);
-    // Make sure to throw a specific error that can be handled in the middleware
     const authError = new Error('Invalid or expired token');
     // @ts-ignore - Adding custom property to Error
     authError.code = 'UNAUTHORIZED';
@@ -42,7 +41,7 @@ export const authRouter = router({
         // Verify Google token
         const ticket = await googleClient.verifyIdToken({
           idToken: input.credential,
-          audience: process.env.GOOGLE_CLIENT_ID,
+          audience: Deno.env.get('GOOGLE_CLIENT_ID'),
         });
 
         const payload = ticket.getPayload();
@@ -63,14 +62,14 @@ export const authRouter = router({
         // Generate access token (short-lived)
         const accessToken = jwt.sign(
           { userId: user._id },
-          process.env.AUTH_SECRET || 'fallback-secret',
+          Deno.env.get('AUTH_SECRET') || 'fallback-secret',
           { expiresIn: '7d' }
         );
 
         // Generate refresh token (long-lived)
         const refreshToken = jwt.sign(
-          { userId: user._id, version: user.tokenVersion }, // add tokenVersion to user model
-          process.env.REFRESH_SECRET || 'refresh-secret',
+          { userId: user._id, version: user.tokenVersion },
+          Deno.env.get('REFRESH_SECRET') || 'refresh-secret',
           { expiresIn: '14d' }
         );
 
@@ -104,14 +103,13 @@ export const authRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
-        // Get the user ID from the JWT token
         const token = input.token;
 
         if (!token) {
           throw new Error('Authentication required');
         }
 
-        const decoded = jwt.verify(token, process.env.AUTH_SECRET || 'fallback-secret') as {
+        const decoded = jwt.verify(token, Deno.env.get('AUTH_SECRET') || 'fallback-secret') as {
           userId: string;
         };
         const user = await UserModel.findById(decoded.userId);
@@ -160,7 +158,7 @@ export const authRouter = router({
       } satisfies User;
     } catch (error) {
       console.error('Get user error:', error);
-      throw error; // Use the original error to preserve code/status
+      throw error;
     }
   }),
 
@@ -206,16 +204,15 @@ export const authRouter = router({
       }
     }),
 
-  // Add new refresh token endpoint
   refreshToken: publicProcedure
     .input(z.object({ refreshToken: z.string() }))
     .mutation(async ({ input }) => {
       try {
-        console.log('auth.ts 🔑 Verifying refresh token:', input.refreshToken);
+        console.log('Verifying refresh token');
 
         const decoded = jwt.verify(
           input.refreshToken,
-          process.env.REFRESH_SECRET || 'refresh-secret'
+          Deno.env.get('REFRESH_SECRET') || 'refresh-secret'
         ) as {
           userId: string;
           version: number;
@@ -232,14 +229,14 @@ export const authRouter = router({
         // Generate new access token
         const accessToken = jwt.sign(
           { userId: user._id },
-          process.env.AUTH_SECRET || 'fallback-secret',
+          Deno.env.get('AUTH_SECRET') || 'fallback-secret',
           { expiresIn: '7d' }
         );
 
         return { accessToken };
       } catch (error) {
         console.error('Refresh token error:', error);
-        throw error; // Use the original error to preserve code/status
+        throw error;
       }
     }),
 });

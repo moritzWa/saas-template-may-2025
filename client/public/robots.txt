@@ -1,6 +1,0 @@
-# https://www.robotstxt.org/robotstxt.html
-User-agent: *
-Allow: /
-Allow: /t/
-
-Sitemap: https://PROJECT_NAME.app/sitemap.xml

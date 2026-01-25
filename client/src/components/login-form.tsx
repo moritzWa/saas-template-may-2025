@@ -1,16 +1,18 @@
-import { defaultPage, LINK_TO_WAITLIST } from '@/App';
-import { useLocation } from 'react-router-dom';
-
+import { useRouter } from 'next/router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { trpc } from '@/utils/trpc';
 import { cn } from '@/lib/utils';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { useCallback, useEffect } from 'react';
 
+// Config constants
+const DEFAULT_PAGE = '/home';
+const LINK_TO_WAITLIST = process.env.NEXT_PUBLIC_LINK_TO_WAITLIST === 'true';
+
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const reason = searchParams.get('reason');
+  const router = useRouter();
+  const reason = router.query.reason as string | undefined;
+
   const getLoginTitle = () => {
     switch (reason) {
       case 'enrichment-login-wall':
@@ -40,36 +42,36 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
-      window.location.href = defaultPage;
+      router.push(DEFAULT_PAGE);
     }
-  }, []);
+  }, [router]);
 
   const googleLoginMutation = trpc.auth.googleLogin.useMutation();
 
-  const handleGoogleSuccess = useCallback(async (credentialResponse: CredentialResponse) => {
-    if (!credentialResponse.credential) return;
+  const handleGoogleSuccess = useCallback(
+    async (credentialResponse: CredentialResponse) => {
+      if (!credentialResponse.credential) return;
 
-    try {
-      const response = await googleLoginMutation.mutateAsync({
-        credential: credentialResponse.credential,
-      });
+      try {
+        const response = await googleLoginMutation.mutateAsync({
+          credential: credentialResponse.credential,
+        });
 
-      // Store tokens with both the new and old keys
-      localStorage.setItem('accessToken', response.accessToken);
-      localStorage.setItem('refreshToken', response.refreshToken);
-      localStorage.setItem('token', response.accessToken); // For backward compatibility
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        localStorage.setItem('token', response.accessToken);
 
-      console.log('Successfully stored tokens');
-
-      if (LINK_TO_WAITLIST) {
-        window.location.href = '/waitlist-form';
-      } else {
-        window.location.href = defaultPage;
+        if (LINK_TO_WAITLIST) {
+          router.push('/waitlist-form');
+        } else {
+          router.push(DEFAULT_PAGE);
+        }
+      } catch (error) {
+        console.error('Login failed:', error);
       }
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  }, []);
+    },
+    [googleLoginMutation, router]
+  );
 
   return (
     <div className={cn('flex flex-col gap-6 items-center w-full', className)} {...props}>
@@ -92,7 +94,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <div className="text-sm text-center">
                 Don&apos;t have an account?{' '}
                 <button
-                  onClick={() => (window.location.href = '/signup')}
+                  type="button"
+                  onClick={() => router.push('/signup')}
                   className="underline underline-offset-4 hover:text-primary"
                 >
                   Sign up

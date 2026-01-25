@@ -1,50 +1,40 @@
-other stuff to scrape
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-- https://console.algora.io/home/projects
+## Getting Started
 
-# About This repo
+First, run the development server:
 
-## About this project
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-A collection of functions and UIs to scrape GitHub users, filter them, (and map user relationships).
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-![image](https://user-images.githubusercontent.com/42035131/147149300-0790602f-9211-4a8a-b792-85a1a5496208.png)
+You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
-Edit and view [project schema](https://webwhiteboard.com/board/4soRD5sL0PStMV4jN2qlRgudQTfaxQ0L/)
+[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-Related [Slack discussion](https://remnote.slack.com/archives/C02KMJAR3UK/p1635966287031200).
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
 
-First [demo and task definiton](https://observablehq.com/@moritzwa/stargazers-forks-filter-scraper).
+This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Deploy
+## Learn More
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/646b4908-932f-4f9c-b1a9-ff04594bfcb0/deploy-status)](https://app.netlify.com/sites/github-scraper-tool/deploys)
+To learn more about Next.js, take a look at the following resources:
 
-## Available Scripts
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
 
-In the project directory, you can run:
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### `npm start`
+## Deploy on Vercel
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-# repo-scraper
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
