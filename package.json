@@ -7,10 +7,10 @@
     "shared"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
+    "dev:client": "cd client && bun run dev",
     "dev:server": "cd server && deno task dev",
-    "build:client": "cd client && npm run build",
+    "build:client": "cd client && bun run build",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
