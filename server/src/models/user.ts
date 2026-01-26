@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { HydratedDocument, InferSchemaType } from 'mongoose';
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
   hasSubscription: { type: Boolean, default: false },
+  subscriptionEndsAt: { type: Date },
   stripeCustomerId: { type: String },
   exportActionUsageCount: { type: Number, default: 0 },
   waitlistData: {
@@ -40,5 +41,11 @@ const userSchema = new mongoose.Schema({
     default: 0,
   },
 });
+
+// Inferred from schema - for plain data (DTOs, API responses)
+export type IUser = InferSchemaType<typeof userSchema>;
+
+// For database documents - includes _id, save(), etc.
+export type UserDocument = HydratedDocument<IUser>;
 
 export const User = mongoose.model('User', userSchema);

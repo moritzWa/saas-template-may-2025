@@ -1,16 +1,12 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import mongoose from 'mongoose';
-import Stripe from 'stripe';
-import { User as UserModel } from './models/user.ts';
 import { publicProcedure, router } from './trpc.ts';
+import { addCorsHeaders, corsHeaders } from './utils/cors.ts';
+import { handleStripeWebhook } from './webhooks/stripe.ts';
+import { handleTestRoutes } from './routes/test.ts';
 
 // Export tRPC utilities
 export { publicProcedure, router };
-
-const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-const stripe = stripeKey
-  ? new Stripe(stripeKey, { apiVersion: '2025-02-24.acacia' })
-  : null;
 
 // Import routers
 import { authRouter } from './routers/auth.ts';
@@ -24,32 +20,13 @@ export const appRouter = router({
 
 export type AppRouter = typeof appRouter;
 
-// CORS headers helper
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Origin, Accept, stripe-signature',
-  'Access-Control-Allow-Credentials': 'true',
-};
-
-function addCorsHeaders(response: Response, origin?: string): Response {
-  const headers = new Headers(response.headers);
-  headers.set('Access-Control-Allow-Origin', origin || '*');
-  headers.set('Access-Control-Allow-Credentials', 'true');
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-}
-
 // MongoDB connection
 const MONGODB_URI = Deno.env.get('MONGODB_URI') || 'mongodb://localhost:27017/PROJECT_NAME';
 
 mongoose
   .connect(MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.error('MongoDB connection error:', error));
+  .catch((error: unknown) => console.error('MongoDB connection error:', error));
 
 // Start server
 const PORT = parseInt(Deno.env.get('PORT') || '3001');
@@ -63,77 +40,9 @@ Deno.serve({ port: PORT }, async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Stripe webhook - needs raw body
+  // Stripe webhook
   if (req.method === 'POST' && url.pathname === '/api/webhooks/stripe') {
-    if (!stripe) {
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: 'Stripe not configured' }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-        origin
-      );
-    }
-    const sig = req.headers.get('stripe-signature');
-    if (!sig) {
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: 'Missing stripe-signature' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-        origin
-      );
-    }
-
-    try {
-      const rawBody = await req.text();
-      const event = stripe.webhooks.constructEvent(
-        rawBody,
-        sig,
-        Deno.env.get('STRIPE_WEBHOOK_SECRET') || ''
-      );
-
-      console.log('Webhook received:', event.type);
-
-      if (event.type === 'checkout.session.completed') {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const customerId = session.customer as string;
-
-        const user = await UserModel.findOne({ stripeCustomerId: customerId });
-        if (user) {
-          user.hasSubscription = true;
-          await user.save();
-          console.log('Subscription activated for:', user.email);
-        }
-      }
-
-      if (event.type === 'customer.subscription.deleted') {
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-
-        const user = await UserModel.findOne({ stripeCustomerId: customerId });
-        if (user) {
-          user.hasSubscription = false;
-          await user.save();
-          console.log('Subscription deactivated for:', user.email);
-        }
-      }
-
-      return addCorsHeaders(
-        new Response(JSON.stringify({ received: true }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-        origin
-      );
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      console.error('Webhook error:', message);
-      return addCorsHeaders(
-        new Response(`Webhook Error: ${message}`, { status: 400 }),
-        origin
-      );
-    }
+    return handleStripeWebhook(req, origin);
   }
 
   // Sitemap
@@ -147,72 +56,15 @@ Deno.serve({ port: PORT }, async (req) => {
   </url>
 </urlset>`;
     return addCorsHeaders(
-      new Response(sitemap, {
-        headers: { 'Content-Type': 'application/xml' },
-      }),
+      new Response(sitemap, { headers: { 'Content-Type': 'application/xml' } }),
       origin
     );
   }
 
   // Test routes (remove in production)
-  if (url.pathname === '/test/create-user' && req.method === 'POST') {
-    try {
-      const body = await req.json();
-      const user = await UserModel.create({
-        email: body.email || `test-${Date.now()}@example.com`,
-        name: body.name || 'Test User',
-        googleId: `test-${Date.now()}`,
-      });
-      return addCorsHeaders(
-        new Response(JSON.stringify({ success: true, user: { id: user._id, email: user.email, name: user.name } }), {
-          headers: { 'Content-Type': 'application/json' },
-        }),
-        origin
-      );
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: message }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
-        origin
-      );
-    }
-  }
-
-  if (url.pathname === '/test/delete-user' && req.method === 'POST') {
-    try {
-      const body = await req.json();
-      const result = await UserModel.deleteOne({ _id: body.id });
-      return addCorsHeaders(
-        new Response(JSON.stringify({ success: true, deleted: result.deletedCount }), {
-          headers: { 'Content-Type': 'application/json' },
-        }),
-        origin
-      );
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: message }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
-        origin
-      );
-    }
-  }
-
-  if (url.pathname === '/test/list-users' && req.method === 'GET') {
-    try {
-      const users = await UserModel.find({}).select('_id email name').limit(10);
-      return addCorsHeaders(
-        new Response(JSON.stringify({ users }), {
-          headers: { 'Content-Type': 'application/json' },
-        }),
-        origin
-      );
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      return addCorsHeaders(
-        new Response(JSON.stringify({ error: message }), { status: 500, headers: { 'Content-Type': 'application/json' } }),
-        origin
-      );
-    }
+  if (url.pathname.startsWith('/test/')) {
+    const testResponse = await handleTestRoutes(req, url.pathname, origin);
+    if (testResponse) return testResponse;
   }
 
   // tRPC handler
@@ -222,7 +74,7 @@ Deno.serve({ port: PORT }, async (req) => {
       req,
       router: appRouter,
       createContext: () => ({}),
-      onError({ error, path }) {
+      onError({ error, path }: { error: Error; path: string | undefined }) {
         console.error(`Error in tRPC path ${path}:`, error);
       },
     });

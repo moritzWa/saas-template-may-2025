@@ -154,6 +154,7 @@ export const authRouter = router({
         name: user.name,
         picture: user.picture,
         hasSubscription: user.hasSubscription,
+        subscriptionEndsAt: user.subscriptionEndsAt?.toISOString() ?? null,
         isWaitlisted: user.isWaitlisted,
       } satisfies User;
     } catch (error) {

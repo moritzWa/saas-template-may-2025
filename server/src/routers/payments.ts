@@ -6,7 +6,9 @@ import { verifyToken } from './auth.ts';
 
 const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
 const stripe = stripeKey
-  ? new Stripe(stripeKey, { apiVersion: '2025-02-24.acacia' })
+  ? new Stripe(stripeKey, {
+      httpClient: Stripe.createFetchHttpClient(),
+    })
   : null;
 
 const PRICE_ID = Deno.env.get('STRIPE_PRICE_ID') || '';

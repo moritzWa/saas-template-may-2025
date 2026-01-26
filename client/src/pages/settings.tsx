@@ -14,6 +14,7 @@ interface UserInfo {
   email: string;
   picture?: string | null;
   hasSubscription?: boolean;
+  subscriptionEndsAt?: string | null;
 }
 
 const LoadingSkeleton = () => (
@@ -73,6 +74,7 @@ export default function SettingsPage() {
         email: userData.email || '',
         picture: userData.picture,
         hasSubscription: userData.hasSubscription,
+        subscriptionEndsAt: userData.subscriptionEndsAt,
       });
     }
     if (queryError) {
@@ -174,9 +176,14 @@ export default function SettingsPage() {
                   <h3 className="text-lg font-medium">Subscription Status</h3>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-4">
+                  <p className="mb-2">
                     {user.hasSubscription ? '✅ Active Subscription' : '❌ No Active Subscription'}
                   </p>
+                  {user.subscriptionEndsAt && (
+                    <p className="mb-4 text-amber-600 dark:text-amber-400">
+                      ⚠️ Cancels on {new Date(user.subscriptionEndsAt).toLocaleDateString()}
+                    </p>
+                  )}
                   {user.hasSubscription ? (
                     <Button
                       onClick={handleManageSubscription}
