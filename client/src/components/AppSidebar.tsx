@@ -1,4 +1,16 @@
-import { Moon, MoreVertical, Plus, Settings, Share, Sun, Trash2 } from 'lucide-react';
+import {
+  FileText,
+  Folder,
+  Home,
+  Moon,
+  MoreVertical,
+  PanelLeft,
+  Plus,
+  Settings,
+  Share,
+  Sun,
+  Trash2,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTheme } from '@/components/theme-provider';
@@ -21,38 +33,53 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarTrigger,
+  useSidebar,
 } from './ui/sidebar';
 
 // Example items to demonstrate sidebar functionality
 const sidebarExampleItems = [
-  { id: '1', name: 'Example Item 1' },
-  { id: '2', name: 'Example Item 2' },
-  { id: '3', name: 'Example Item 3' },
+  { id: '1', name: 'Example Item 1', icon: FileText },
+  { id: '2', name: 'Example Item 2', icon: Folder },
+  { id: '3', name: 'Example Item 3', icon: FileText },
 ];
 
 export function AppSidebar() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const { toggleSidebar, state } = useSidebar();
 
   const handleCreateNew = () => {
     router.push('/new');
   };
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center p-[0.12rem] justify-between">
-          <h2 className="text-lg ml-2 font-semibold">
-            <Link href="/home">PROJECT_NAME</Link>
-          </h2>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleCreateNew} className="h-6 w-6">
-              <Plus />
-            </Button>
-            {router.pathname !== '/home' && <SidebarTrigger className="h-6 w-6" />}
-          </div>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              size="lg"
+              tooltip="PROJECT_NAME"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <Link href="/home">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Home className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">PROJECT_NAME</span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={handleCreateNew} tooltip="New">
+              <Plus className="size-4" />
+              <span>New</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -62,43 +89,40 @@ export function AppSidebar() {
               {sidebarExampleItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    asChild
                     onClick={() => router.push(`/items/${item.id}`)}
                     isActive={router.pathname === `/items/${item.id}`}
-                    className="relative group/item cursor-pointer flex w-full items-center"
+                    tooltip={item.name}
+                    className="relative group/item cursor-pointer"
                   >
-                    <div className="flex-1 min-w-0">
-                      <span className="block truncate">{item.name}</span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 opacity-0 group-hover/item:opacity-100 group-hover/item:bg-background absolute right-1"
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => alert('Share functionality not implemented in template')}
-                          >
-                            <Share className="mr-2 h-4 w-4" />
-                            <span>Share</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() =>
-                              alert('Delete functionality not implemented in template')
-                            }
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Delete</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    <item.icon className="size-4" />
+                    <span className="truncate">{item.name}</span>
                   </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 opacity-0 group-hover/item:opacity-100 absolute right-1 top-1 group-data-[collapsible=icon]:hidden"
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => alert('Share functionality not implemented in template')}
+                      >
+                        <Share className="mr-2 h-4 w-4" />
+                        <span>Share</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() => alert('Delete functionality not implemented in template')}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -107,26 +131,27 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <div className="flex items-center justify-between px-2 py-2">
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={() => router.push('/settings')}
-                isActive={router.pathname === '/settings'}
-              >
-                <Settings className="mr-2" />
-                Settings
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={() => router.push('/settings')}
+              isActive={router.pathname === '/settings'}
+              tooltip="Settings"
+            >
+              <Settings className="size-4" />
+              <span>Settings</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  {theme === 'light' && <Sun className="h-4 w-4" />}
-                  {theme === 'dark' && <Moon className="h-4 w-4" />}
-                  {theme === 'system' && <Sun className="h-4 w-4" />}
-                </Button>
+                <SidebarMenuButton tooltip="Theme">
+                  {theme === 'light' && <Sun className="size-4" />}
+                  {theme === 'dark' && <Moon className="size-4" />}
+                  {theme === 'system' && <Sun className="size-4" />}
+                  <span>Theme</span>
+                </SidebarMenuButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent side="right" align="end">
                 <DropdownMenuItem onClick={() => setTheme('light')}>
                   <Sun className="mr-2 h-4 w-4" />
                   <span>Light</span>
@@ -140,7 +165,13 @@ export function AppSidebar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={toggleSidebar} tooltip={state === 'expanded' ? 'Collapse' : 'Expand'}>
+              <PanelLeft className="size-4" />
+              <span>{state === 'expanded' ? 'Collapse' : 'Expand'}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
