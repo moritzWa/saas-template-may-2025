@@ -69,7 +69,7 @@ export async function handleStripeWebhook(req: Request, origin?: string): Promis
     }
 
     if (event.type === 'customer.subscription.updated') {
-      const subscription = event.data.object as Stripe.Subscription;
+      const subscription = event.data.object as Stripe.Subscription & { current_period_end?: number };
       const customerId = subscription.customer as string;
 
       const user = await UserModel.findOne({ stripeCustomerId: customerId });

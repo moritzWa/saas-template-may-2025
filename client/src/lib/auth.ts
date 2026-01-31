@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
-import type { AppRouter } from '@shared/trpc-types';
+import type { AppRouter } from '../../../server/src/index.ts';
 
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
 

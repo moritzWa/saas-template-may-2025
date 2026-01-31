@@ -9,9 +9,5 @@
   },
   "scripts": {
     "build": "tsc"
-  },
-  "dependencies": {
-    "@trpc/server": "^10.45.0",
-    "zod": "^3.22.4"
   }
 }

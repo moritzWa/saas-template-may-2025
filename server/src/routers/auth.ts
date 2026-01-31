@@ -27,8 +27,7 @@ export function verifyToken(token: string): { userId: string } {
     return decoded;
   } catch (error) {
     console.error('Token verification error:', error);
-    const authError = new Error('Invalid or expired token');
-    // @ts-ignore - Adding custom property to Error
+    const authError = new Error('Invalid or expired token') as Error & { code: string };
     authError.code = 'UNAUTHORIZED';
     throw authError;
   }
@@ -229,8 +228,7 @@ export const authRouter = router({
 
         const user = await UserModel.findById(decoded.userId);
         if (!user || user.tokenVersion !== decoded.version) {
-          const error = new Error('Invalid refresh token');
-          // @ts-ignore - Adding custom property to Error
+          const error = new Error('Invalid refresh token') as Error & { code: string };
           error.code = 'UNAUTHORIZED';
           throw error;
         }

@@ -60,12 +60,12 @@ export async function createOrUpdateContact(options: CreateContactOptions): Prom
   };
 
   try {
-    await loops.createContact(options.email, properties);
+    await loops.createContact({ email: options.email, ...properties });
     console.log('✅ Contact added to Loops:', options.email);
     return true;
   } catch (_createError) {
     try {
-      await loops.updateContact(options.email, properties);
+      await loops.updateContact({ email: options.email, ...properties });
       console.log('✅ Contact updated in Loops:', options.email);
       return true;
     } catch (updateError) {
