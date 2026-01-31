@@ -57,3 +57,4 @@ build/
 coverage/
 .DS_Store
 *.log
+.next/
