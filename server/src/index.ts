@@ -29,7 +29,7 @@ mongoose
   .catch((error: unknown) => console.error('MongoDB connection error:', error));
 
 // Start server
-const PORT = parseInt(Deno.env.get('PORT') || '3001');
+const PORT = parseInt(Deno.env.get('PORT') || '8000');
 
 Deno.serve({ port: PORT }, async (req) => {
   const url = new URL(req.url);

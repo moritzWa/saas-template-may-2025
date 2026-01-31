@@ -1,198 +1,92 @@
 # PROJECT_NAME
 
-A modern SaaS template with authentication, payments, and a beautiful UI. This template was originally built as an AI-powered spreadsheet tool, which is why you might notice some table-related naming conventions in the codebase.
+A modern SaaS template with authentication, payments, and a beautiful UI.
 
 ## Tech Stack
 
-### Core Technologies
-
-- 🚀 **Bun** - Fast JavaScript runtime and package manager
-- 🔄 **Monorepo Structure** with workspaces (client, server, shared)
-- 📱 **React** + **TypeScript** for the frontend
-- 🎨 **Tailwind CSS** + **Shadcn UI** for styling
-- 🔐 **tRPC** for type-safe API calls
-- 💳 **Stripe** for payments
-- 📊 **MongoDB** for database
-
-### Key Libraries
-
-- **Craco** - Used for customizing Create React App configuration without ejecting
-- **Lucide React** - Icon library
-- **React Router** - Client-side routing
-- **React Query** - Data fetching and caching
-- **Zod** - Schema validation
+- **Frontend:** Next.js 15 (Pages Router) + TypeScript + Tailwind CSS + shadcn/ui
+- **Backend:** Deno + tRPC
+- **Database:** MongoDB
+- **Auth:** Google OAuth
+- **Payments:** Stripe
+- **Package Manager:** Bun
 
 ## Project Structure
 
 ```
 .
-├── client/                 # React frontend
-│   ├── src/               # Source code
-│   ├── craco.config.js    # Craco configuration for CRA customization
-│   └── package.json       # Frontend dependencies
-├── server/                # Backend server
-│   ├── src/              # Source code
-│   └── package.json      # Backend dependencies
-└── shared/               # Shared types and utilities
-    ├── types.ts         # Shared TypeScript types
-    └── package.json     # Shared package configuration
+├── client/          # Next.js frontend
+│   ├── src/
+│   │   ├── pages/   # Next.js pages
+│   │   ├── components/
+│   │   └── lib/
+│   └── package.json
+├── server/          # Deno backend
+│   ├── src/
+│   │   ├── routers/ # tRPC routers
+│   │   ├── models/  # Mongoose models
+│   │   └── index.ts
+│   └── deno.json
+└── shared/          # Shared types
+    └── types.ts
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- Bun (latest version)
+- [Bun](https://bun.sh/) (for package management and client)
+- [Deno](https://deno.land/) (for server)
 - MongoDB
 - Stripe account
 - Google OAuth credentials
 
 ### Environment Variables
 
-Contact the project maintainer to get the required environment variables. You'll need to set up:
+Create `.env` files in both `client/` and `server/` directories. Required variables:
 
-- MongoDB connection string
-- Stripe API keys
-- Google OAuth credentials
-- Other service-specific keys
+**Server (`server/.env`):**
+- `MONGODB_URI` - MongoDB connection string
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
+- `JWT_SECRET` - Secret for JWT tokens
+- `STRIPE_SECRET_KEY` - Stripe secret key
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
+- `CLIENT_URL` - Frontend URL (e.g., `http://localhost:3000`)
+
+**Client (`client/.env.local`):**
+- `NEXT_PUBLIC_API_URL` - Backend URL (e.g., `http://localhost:8000`)
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client ID
 
 ### Installation
 
-1. Clone the repository
-
 ```bash
-git clone https://github.com/your-username/PROJECT_NAME.git
-cd PROJECT_NAME
-```
-
-2. Install dependencies
-
-```bash
+# Install all dependencies
 bun install
+
+# Start both servers (recommended)
+bun run dev
+
+# Or start separately:
+bun run dev:client  # Next.js on :3000
+bun run dev:server  # Deno on :8000
 ```
 
-3. Start the development servers
-
-For the frontend (in the client directory):
+### Stripe Webhooks (Development)
 
 ```bash
-cd client
-bun dev
+stripe listen --forward-to localhost:8000/webhook/stripe
 ```
-
-For the backend (in the server directory):
-
-```bash
-cd server
-bun dev
-```
-
-## Monorepo Structure
-
-This project uses a monorepo structure with three main packages:
-
-### Client (`/client`)
-
-- Built with Create React App + Craco
-- Uses Tailwind CSS for styling
-- Implements Shadcn UI components
-- Handles all frontend logic and UI
-
-### Server (`/server`)
-
-- Bun-based backend
-- tRPC for type-safe API endpoints
-- MongoDB integration
-- Handles authentication and payments
-
-### Shared (`/shared`)
-
-- Contains shared TypeScript types
-- Used by both client and server
-- Ensures type safety across the stack
 
 ## Customization
 
-Search for "PROJECT_NAME" in the codebase to find all instances that need to be replaced with your own brand name. Key files to check:
-
-- `client/src/components/LandingPage.tsx`
-- `client/src/App.tsx`
-- `client/src/components/navbar.tsx`
-- `server/src/index.ts`
+Search for `PROJECT_NAME` in the codebase to find all instances to replace with your brand name.
 
 ## Deployment
 
-The application is set up as a monorepo with separate client and server packages:
-
-- Frontend: Deploy the `client` directory to a static hosting service
-- Backend: Deploy the `server` directory to a Node.js hosting service
-
----
-
-## Deployment on Render
-
-This project is set up for easy deployment on [Render](https://render.com/). Below are the recommended settings for both the client and server services.
-
-### Client (Static Site)
-
-- **Root Directory:** `client`
-- **Publish Directory:** `client/build`
-- **Build Command:**
-
-  ```sh
-  cd client && bun install && bun add -d @craco/craco ajv ajv-keywords && bun run build
-  ```
-
-  This command installs dependencies, ensures required build tools are present, and builds the React app.
-
-- **Redirect and Rewrite Rules:**  
-  To support client-side routing (React Router), add the following rule:
-
-  | Source | Destination | Action  |
-  | ------ | ----------- | ------- |
-  | /\*    | /index.html | Rewrite |
-
-  This ensures all routes are handled by your React app.
-
-### Server (Web Service)
-
-- **Root Directory:** `server`
-- **Build Command:**
-  ```sh
-  bun install && bun run build
-  ```
-- **Start Command:**
-  ```sh
-  bun start
-  ```
-
-> **Note:**  
-> The previous project was called "deeptable" (as seen in the screenshots), so you may see references to that name in Render or in some configuration files. You can safely update these to your new project name.
-
----
+- **Frontend:** Deploy to Vercel (recommended for Next.js)
+- **Backend:** Deploy to Deno Deploy
 
 ## License
 
 MIT
-
-## Support
-
-For questions or support, please open an issue in the repository.
-
-### Build Process
-
-The server uses a custom build script (`build.js`) that:
-
-1. Installs dependencies
-2. Compiles TypeScript code
-3. Copies shared types to the build directory
-4. Organizes the compiled files into the correct structure:
-   - Moves the main server file to the root of `dist`
-   - Copies routers, models, and lib directories to their proper locations
-   - Ensures all necessary files are in place for production deployment
-
-This build process is important because:
-
-- It maintains the correct file structure for the server
-- It ensures shared types are available to the compiled server code
-- It prepares the codebase for production deployment
