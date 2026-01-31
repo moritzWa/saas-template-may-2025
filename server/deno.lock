@@ -4,6 +4,7 @@
     "npm:@trpc/server@^10.45.0": "10.45.4",
     "npm:google-auth-library@^9.15.1": "9.15.1",
     "npm:jsonwebtoken@^9.0.2": "9.0.3",
+    "npm:loops@3": "3.4.1",
     "npm:mongoose@^8.1.1": "8.21.1",
     "npm:stripe@^17.7.0": "17.7.0",
     "npm:zod@^3.22.4": "3.25.76"
@@ -243,6 +244,9 @@
     "lodash.once@4.1.1": {
       "integrity": "sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg=="
     },
+    "loops@3.4.1": {
+      "integrity": "sha512-7PEdG+Tf9yYL8lOOg4OvnVP38UzKsBGBu+SQH24QHAyVSyWWrQtzZ2HWUCLgPXB7adRkVbSNdANjsRxkjLOsFQ=="
+    },
     "math-intrinsics@1.1.0": {
       "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g=="
     },
@@ -410,6 +414,7 @@
       "npm:@trpc/server@^10.45.0",
       "npm:google-auth-library@^9.15.1",
       "npm:jsonwebtoken@^9.0.2",
+      "npm:loops@3",
       "npm:mongoose@^8.1.1",
       "npm:stripe@^17.7.0",
       "npm:zod@^3.22.4"

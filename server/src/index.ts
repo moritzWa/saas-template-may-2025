@@ -10,11 +10,13 @@ export { publicProcedure, router };
 
 // Import routers
 import { authRouter } from './routers/auth.ts';
+import { documentsRouter } from './routers/documents.ts';
 import { paymentsRouter } from './routers/payments.ts';
 
 // Create app router
 export const appRouter = router({
   auth: authRouter,
+  documents: documentsRouter,
   payments: paymentsRouter,
 });
 

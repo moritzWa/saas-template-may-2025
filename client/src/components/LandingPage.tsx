@@ -2,11 +2,7 @@ import { useRouter } from 'next/router';
 import { Cursor, useTypewriter } from 'react-simple-typewriter';
 import { Button } from './ui/button';
 
-interface LandingPageProps {
-  landingPageKeyword?: string;
-}
-
-export default function LandingPage({ landingPageKeyword }: LandingPageProps) {
+export default function LandingPage() {
   const router = useRouter();
 
   const [text] = useTypewriter({

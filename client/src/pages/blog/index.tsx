@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { Navbar } from '@/components/navbar';
+import { Navbar } from '@/components/Navbar';
 import { blogPosts } from '@/lib/blog-data';
 
 export default function BlogPage() {

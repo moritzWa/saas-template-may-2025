@@ -1,6 +1,6 @@
 import Head from 'next/head';
-import { Navbar } from '@/components/navbar';
-import { LoginForm } from '@/components/login-form';
+import { Navbar } from '@/components/Navbar';
+import { LoginForm } from '@/components/LoginForm';
 
 export default function LoginPage() {
   return (

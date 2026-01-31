@@ -49,10 +49,15 @@ Create `.env` files in both `client/` and `server/` directories. Required variab
 - `MONGODB_URI` - MongoDB connection string
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
-- `JWT_SECRET` - Secret for JWT tokens
+- `AUTH_SECRET` - Secret for JWT tokens
+- `REFRESH_SECRET` - Secret for refresh tokens
 - `STRIPE_SECRET_KEY` - Stripe secret key
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook signing secret
 - `CLIENT_URL` - Frontend URL (e.g., `http://localhost:3000`)
+
+**Email (Optional):**
+- `LOOPS_API_KEY` - Loops.so API key for transactional emails
+- `LOOPS_WELCOME_EMAIL_ID` - Template ID for welcome email
 
 **Client (`client/.env.local`):**
 - `NEXT_PUBLIC_API_URL` - Backend URL (e.g., `http://localhost:8000`)

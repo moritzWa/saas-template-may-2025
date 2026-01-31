@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
-import { Navbar } from '@/components/navbar';
+import { Navbar } from '@/components/Navbar';
 import { BlogPost } from '@/components/BlogPost';
 import { Button } from '@/components/ui/button';
 import { getBlogPostBySlug, blogPosts } from '@/lib/blog-data';

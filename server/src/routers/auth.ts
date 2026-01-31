@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { User as UserModel } from '../models/user.ts';
 import { publicProcedure, router } from '../trpc.ts';
+import { sendWelcomeEmail } from '../utils/email.ts';
 
 const googleClient = new OAuth2Client(
   Deno.env.get('GOOGLE_CLIENT_ID'),
@@ -57,6 +58,13 @@ export const authRouter = router({
             googleId: payload.sub,
             picture: payload.picture,
           });
+
+          // Send welcome email to new user (non-blocking)
+          if (payload.email && payload.name) {
+            sendWelcomeEmail(payload.email, payload.name).catch((err) =>
+              console.error('Welcome email error:', err)
+            );
+          }
         }
 
         // Generate access token (short-lived)

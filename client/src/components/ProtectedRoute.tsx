@@ -1,38 +1,43 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { trpc } from '@/utils/trpc';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('accessToken');
+}
+
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
+  const token = getToken();
 
-  const { data: userData, isLoading } = trpc.auth.getUser.useQuery(
-    { token: typeof window !== 'undefined' ? localStorage.getItem('accessToken') || '' : '' },
+  const { isLoading } = trpc.auth.getUser.useQuery(
+    { token: token || '' },
     {
-      enabled: typeof window !== 'undefined' && !!localStorage.getItem('accessToken'),
+      enabled: !!token,
       retry: false,
     }
   );
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      router.push('/login');
-      return;
+    if (typeof window !== 'undefined' && !getToken()) {
+      router.push('/landing');
     }
+  }, [router]);
 
-    if (!isLoading) {
-      setIsChecking(false);
-    }
-  }, [isLoading, router]);
+  if (typeof window === 'undefined' || !token) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
-  if (isChecking || isLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div>Loading...</div>

@@ -91,7 +91,7 @@ export default function SettingsPage() {
       if (url) {
         window.location.href = url;
       }
-    } catch (err) {
+    } catch {
       setError('Failed to create checkout session');
     } finally {
       setIsLoading(false);
@@ -107,7 +107,7 @@ export default function SettingsPage() {
       if (url) {
         window.location.href = url;
       }
-    } catch (err) {
+    } catch {
       setError('Failed to open subscription management');
     } finally {
       setIsLoading(false);
@@ -157,6 +157,7 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 {user.picture && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={user.picture}
                     alt="Profile"

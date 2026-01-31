@@ -6,7 +6,7 @@ import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { useCallback, useEffect } from 'react';
 
 // Config constants
-const DEFAULT_PAGE = '/home';
+const DEFAULT_PAGE = '/';
 const LINK_TO_WAITLIST = process.env.NEXT_PUBLIC_LINK_TO_WAITLIST === 'true';
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
