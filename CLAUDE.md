@@ -1,5 +1,13 @@
 # Project Instructions
 
+## Testing Changes
+
+**Always test changes by running the dev server yourself** - don't ask the user to test. You have terminal access, so:
+- Run `deno task dev` from the root to start both server and client
+- Use `curl` to test endpoints or pages (e.g., `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/`)
+- Check the server output for errors
+- Kill existing processes first if ports are in use: `pkill -f "next dev"; pkill -f "deno.*server"`
+
 ## Before completing any task
 
 Run type checks and linting on both client and server:

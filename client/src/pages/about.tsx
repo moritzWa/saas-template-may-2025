@@ -1,8 +1,10 @@
 import Head from 'next/head';
 import { Header } from '@/components/header/header';
 import { Footer } from '@/components/footer/footer';
+import { useForceLightMode } from '@/hooks/useForceLightMode';
 
 export default function AboutPage() {
+  useForceLightMode();
   return (
     <>
       <Head>

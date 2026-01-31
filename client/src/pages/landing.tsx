@@ -1,7 +1,9 @@
 import Head from 'next/head';
+import { useForceLightMode } from '@/hooks/useForceLightMode';
 import { Home } from '@/modules/home/home';
 
 export default function Landing() {
+  useForceLightMode();
   return (
     <>
       <Head>

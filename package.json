@@ -8,9 +8,9 @@
   ],
   "scripts": {
     "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
-    "dev:client": "cd client && bun run dev",
+    "dev:client": "cd client && deno task dev",
     "dev:server": "cd server && deno task dev",
-    "build:client": "cd client && bun run build",
+    "build:client": "cd client && deno task build",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
   },

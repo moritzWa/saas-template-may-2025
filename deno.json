@@ -1,0 +1,17 @@
+{
+  "unstable": [
+    "bare-node-builtins",
+    "detect-cjs",
+    "node-globals",
+    "unsafe-proto",
+    "sloppy-imports"
+  ],
+  "nodeModulesDir": "auto",
+  "workspace": ["./client", "./server", "./shared"],
+  "tasks": {
+    "dev": "deno run -A npm:concurrently \"deno task dev:server\" \"deno task dev:client\"",
+    "dev:client": "cd client && deno task dev",
+    "dev:server": "cd server && deno task dev",
+    "build:client": "cd client && deno task build"
+  }
+}

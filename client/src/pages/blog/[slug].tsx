@@ -6,6 +6,7 @@ import { Header } from '@/components/header/header';
 import { Footer } from '@/components/footer/footer';
 import { BlogPost } from '@/components/BlogPost';
 import { Button } from '@/components/ui/button';
+import { useForceLightMode } from '@/hooks/useForceLightMode';
 import { getBlogPostBySlug, blogPosts } from '@/lib/blog-data';
 import { GetStaticPaths, GetStaticProps } from 'next';
 
@@ -14,6 +15,7 @@ interface BlogPostPageProps {
 }
 
 export default function BlogPostPage({ slug }: BlogPostPageProps) {
+  useForceLightMode();
   const router = useRouter();
   const post = getBlogPostBySlug(slug);
 

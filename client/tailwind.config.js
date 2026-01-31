@@ -15,11 +15,11 @@ module.exports = {
         '2xl': '1400px',
       },
     },
-    screens: {
-      tablet: '50.625rem',
-      desktop: '90rem',
-    },
     extend: {
+      screens: {
+        tablet: '50.625rem',
+        desktop: '90rem',
+      },
       fontFamily: {
         sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
         serif: ['var(--font-serif)', 'Georgia', 'serif'],

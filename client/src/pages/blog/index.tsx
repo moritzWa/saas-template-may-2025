@@ -2,9 +2,11 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { Header } from '@/components/header/header';
 import { Footer } from '@/components/footer/footer';
+import { useForceLightMode } from '@/hooks/useForceLightMode';
 import { blogPosts } from '@/lib/blog-data';
 
 export default function BlogPage() {
+  useForceLightMode();
   return (
     <>
       <Head>
