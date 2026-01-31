@@ -2,9 +2,16 @@
   "name": "shared",
   "version": "1.0.0",
   "private": true,
-  "main": "dist/types.js",
-  "types": "dist/types.d.ts",
+  "main": "types.ts",
+  "types": "types.ts",
+  "exports": {
+    "./*": "./*"
+  },
   "scripts": {
     "build": "tsc"
+  },
+  "dependencies": {
+    "@trpc/server": "^10.45.0",
+    "zod": "^3.22.4"
   }
 }

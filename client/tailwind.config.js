@@ -15,7 +15,15 @@ module.exports = {
         '2xl': '1400px',
       },
     },
+    screens: {
+      tablet: '50.625rem',
+      desktop: '90rem',
+    },
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

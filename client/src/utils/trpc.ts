@@ -1,6 +1,6 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
-import type { AppRouter } from '../../../server/src';
+import type { AppRouter } from '@shared/trpc-types';
 import { refreshAccessToken } from '../lib/auth';
 
 const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';

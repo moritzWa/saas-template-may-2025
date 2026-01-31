@@ -12,6 +12,12 @@ cd client && npx tsc --noEmit && npx eslint src/
 cd server && deno check src/index.ts
 ```
 
+For UI changes, also run a build to catch hydration errors (invalid HTML nesting like `<div>` inside `<p>`):
+
+```bash
+cd client && npx next build
+```
+
 Fix all errors and warnings before saying the task is done.
 
 ## File Naming

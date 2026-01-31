@@ -68,8 +68,9 @@ const SidebarProvider = React.forwardRef<
     const isMobile = useIsMobile();
     const [openMobile, setOpenMobile] = React.useState(false);
 
-    // Initialize state from localStorage
+    // Initialize state from localStorage (SSR-safe)
     const [_open, _setOpen] = React.useState(() => {
+      if (typeof window === 'undefined') return defaultOpen;
       const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
       return stored ? stored === 'true' : defaultOpen;
     });

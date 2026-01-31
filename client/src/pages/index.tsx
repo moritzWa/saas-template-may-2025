@@ -7,6 +7,7 @@ import { FileText, Plus } from 'lucide-react';
 import { AppLayout } from '@/components/AppLayout';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/utils/trpc';
+import { useAuthToken, useIsMounted } from '@/hooks/useAuthToken';
 
 type Document = {
   id: string;
@@ -16,14 +17,10 @@ type Document = {
   updatedAt: string;
 };
 
-function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken');
-}
-
 export default function HomePage() {
   const router = useRouter();
-  const token = getToken();
+  const mounted = useIsMounted();
+  const token = useAuthToken();
 
   const { data: documents, isLoading: documentsLoading } = trpc.documents.list.useQuery(
     { token: token || '' },
@@ -37,16 +34,17 @@ export default function HomePage() {
   });
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !getToken()) {
+    if (mounted && !token) {
       router.replace('/landing');
     }
-  }, [router]);
+  }, [mounted, token, router]);
 
   const handleCreateDocument = () => {
     createDocument.mutate({ token: token || '' });
   };
 
-  if (typeof window === 'undefined' || !token) {
+  // Show loading during SSR and until mounted with token
+  if (!mounted || !token) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div>Loading...</div>

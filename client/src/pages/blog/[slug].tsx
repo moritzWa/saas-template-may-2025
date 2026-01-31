@@ -2,7 +2,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { ArrowLeft } from 'lucide-react';
-import { Navbar } from '@/components/Navbar';
+import { Header } from '@/components/header/header';
+import { Footer } from '@/components/footer/footer';
 import { BlogPost } from '@/components/BlogPost';
 import { Button } from '@/components/ui/button';
 import { getBlogPostBySlug, blogPosts } from '@/lib/blog-data';
@@ -16,25 +17,27 @@ export default function BlogPostPage({ slug }: BlogPostPageProps) {
   const router = useRouter();
   const post = getBlogPostBySlug(slug);
 
-  // Handle fallback state
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8 pt-24">
-          <p>Post not found</p>
-          <Link href="/blog">
-            <Button variant="ghost" className="mt-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Blog
-            </Button>
-          </Link>
-        </main>
-      </div>
+      <main className="marketing min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 pt-24 pb-16 px-4">
+          <div className="max-w-3xl mx-auto">
+            <p>Post not found</p>
+            <Link href="/blog">
+              <Button variant="ghost" className="mt-4">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Blog
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </main>
     );
   }
 
@@ -44,12 +47,12 @@ export default function BlogPostPage({ slug }: BlogPostPageProps) {
         <title>{post.title} - PROJECT_NAME</title>
         <meta name="description" content={post.description} />
       </Head>
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8 pt-24">
+      <main className="marketing min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-1 pt-24 pb-16 px-4">
           <div className="max-w-3xl mx-auto">
             <Link href="/blog">
-              <Button variant="ghost" className="mt-4 mb-2 text-gray-600 hover:text-gray-900">
+              <Button variant="ghost" className="mb-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Blog
               </Button>
@@ -62,8 +65,9 @@ export default function BlogPostPage({ slug }: BlogPostPageProps) {
               content={post.content}
             />
           </div>
-        </main>
-      </div>
+        </div>
+        <Footer />
+      </main>
     </>
   );
 }

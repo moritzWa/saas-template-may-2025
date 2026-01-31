@@ -1,6 +1,6 @@
 # PROJECT_NAME
 
-A modern SaaS template with authentication, payments, and a beautiful UI.
+A modern SaaS template with authentication, payments, and a beautiful UI. Has the landing page fronm cronushq.com but assets and text can easily be replaced.
 
 ## Tech Stack
 
@@ -46,6 +46,7 @@ A modern SaaS template with authentication, payments, and a beautiful UI.
 Create `.env` files in both `client/` and `server/` directories. Required variables:
 
 **Server (`server/.env`):**
+
 - `MONGODB_URI` - MongoDB connection string
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
@@ -56,10 +57,12 @@ Create `.env` files in both `client/` and `server/` directories. Required variab
 - `CLIENT_URL` - Frontend URL (e.g., `http://localhost:3000`)
 
 **Email (Optional):**
+
 - `LOOPS_API_KEY` - Loops.so API key for transactional emails
 - `LOOPS_WELCOME_EMAIL_ID` - Template ID for welcome email
 
 **Client (`client/.env.local`):**
+
 - `NEXT_PUBLIC_API_URL` - Backend URL (e.g., `http://localhost:8000`)
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client ID
 
@@ -81,6 +84,20 @@ bun run dev:server  # Deno on :8000
 
 ```bash
 stripe listen --forward-to localhost:8000/webhook/stripe
+```
+
+## Testing
+
+```bash
+# Run Playwright tests
+cd client
+bun run test
+
+# Run tests with UI
+bun run test:ui
+
+# Install Playwright browsers (first time only)
+bunx playwright install
 ```
 
 ## Customization

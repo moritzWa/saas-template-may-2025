@@ -1,26 +1,20 @@
 import Head from 'next/head';
-import { Navbar } from '@/components/Navbar';
-import LandingPage from '@/components/LandingPage';
+import { Home } from '@/modules/home/home';
 
 export default function Landing() {
   return (
     <>
       <Head>
-        <title>PROJECT_NAME - AI Research Assistant</title>
+        <title>PROJECT_NAME - Build your SaaS faster</title>
         <meta
           name="description"
-          content="Intelligent web research assistant that helps you make informed decisions."
+          content="A production-ready template with authentication, payments, and everything you need to launch your next project."
         />
         <meta property="og:title" content="PROJECT_NAME" />
-        <meta property="og:description" content="AI agents that research and output tables" />
+        <meta property="og:description" content="Build your SaaS faster with a modern stack" />
         <meta property="og:type" content="website" />
       </Head>
-      <div className="min-h-screen bg-background text-foreground">
-        <Navbar />
-        <main className="pt-16">
-          <LandingPage />
-        </main>
-      </div>
+      <Home />
     </>
   );
 }
