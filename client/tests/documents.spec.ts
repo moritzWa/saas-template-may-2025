@@ -1,53 +1,103 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
-// TODO: Set up auth mocking or test user credentials
-// For now, these tests assume you're logged in manually or have a test auth setup
+// Helper to wait for save to complete (debounce + network)
+async function waitForSave(page: import('@playwright/test').Page) {
+  // Wait for debounce (500ms) + network request
+  await page.waitForTimeout(700);
+  await page.waitForLoadState('networkidle');
+}
 
 test.describe('Document CRUD', () => {
-  test.skip('should create a new document', async ({ page }) => {
-    // Setup: Mock auth token in localStorage
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.setItem('accessToken', 'test-token');
-    });
-    await page.reload();
+  test('should create a new document', async ({ page }) => {
+    // Should be on home page with auth tokens injected
+    await expect(page.getByRole('heading', { name: 'Documents' })).toBeVisible();
 
-    // Click create document button in sidebar
+    // Click "New Document" button
     await page.getByRole('button', { name: /New Document/i }).click();
 
     // Should navigate to new document page
     await expect(page).toHaveURL(/\/documents\/.+/);
+
+    // Title input should be visible with default placeholder
+    await expect(page.getByPlaceholder('Document title')).toBeVisible();
   });
 
-  test.skip('should edit document title and content', async ({ page }) => {
-    // Navigate to document (replace with actual document ID)
-    await page.goto('/documents/test-document-id');
+  test('should edit document title and content', async ({ page }) => {
+    // Create a new document first
+    await page.getByRole('button', { name: /New Document/i }).click();
+    await expect(page).toHaveURL(/\/documents\/.+/);
 
-    // Edit title
-    const titleInput = page.getByPlaceholder('Document title');
-    await titleInput.fill('Test Document Title');
+    // Edit title first and wait for save (debounce resets on each call, so we must wait)
+    await page.getByPlaceholder('Document title').fill('My Test Document');
+    await waitForSave(page);
 
     // Edit content
-    const contentInput = page.getByPlaceholder('Start writing...');
-    await contentInput.fill('This is test content');
+    await page.getByPlaceholder('Start writing...').fill('This is the content of my test document.');
+    await waitForSave(page);
 
-    // Wait for auto-save
-    await page.waitForTimeout(600);
+    // Navigate back to home
+    await page.getByRole('button', { name: /Back/i }).click();
+    await expect(page).toHaveURL('/');
 
-    // Verify saving indicator appeared
-    await expect(page.getByText('Saving...')).toBeVisible();
+    // Reload to ensure fresh data (React Query cache workaround)
+    await page.reload();
+
+    // Verify document appears in list with correct title (use .first() for main content area)
+    await expect(page.getByRole('link', { name: /My Test Document/i }).first()).toBeVisible();
   });
 
-  test.skip('should delete a document', async ({ page }) => {
-    await page.goto('/documents/test-document-id');
+  test('should read document after navigation', async ({ page }) => {
+    // Create a document with specific content
+    await page.getByRole('button', { name: /New Document/i }).click();
+    await expect(page).toHaveURL(/\/documents\/.+/);
+
+    const testTitle = `Test Doc ${Date.now()}`;
+    const testContent = 'Content for reading test';
+
+    // Edit title first and wait (debounce resets on each call)
+    await page.getByPlaceholder('Document title').fill(testTitle);
+    await waitForSave(page);
+
+    // Edit content and wait
+    await page.getByPlaceholder('Start writing...').fill(testContent);
+    await waitForSave(page);
+
+    // Go back to list
+    await page.getByRole('button', { name: /Back/i }).click();
+    await expect(page).toHaveURL('/');
+
+    // Reload to ensure fresh data (React Query cache workaround)
+    await page.reload();
+
+    // Click on the document to open it (use .first() to avoid sidebar duplicate)
+    await page.getByRole('link', { name: new RegExp(testTitle) }).first().click();
+
+    // Verify content is loaded correctly
+    await expect(page.getByPlaceholder('Document title')).toHaveValue(testTitle);
+    await expect(page.getByPlaceholder('Start writing...')).toHaveValue(testContent);
+  });
+
+  test('should delete a document', async ({ page }) => {
+    // Create a document to delete
+    await page.getByRole('button', { name: /New Document/i }).click();
+    await expect(page).toHaveURL(/\/documents\/.+/);
+
+    const deleteTestTitle = `Delete Test ${Date.now()}`;
+    await page.getByPlaceholder('Document title').fill(deleteTestTitle);
+
+    // Wait for debounced save to complete
+    await waitForSave(page);
+
+    // Set up dialog handler before clicking delete
+    page.on('dialog', (dialog) => dialog.accept());
 
     // Click delete button
     await page.getByRole('button', { name: /Delete/i }).click();
 
-    // Confirm deletion in dialog
-    page.on('dialog', (dialog) => dialog.accept());
-
     // Should navigate back to home
     await expect(page).toHaveURL('/');
+
+    // Document should no longer appear in list
+    await expect(page.getByRole('link', { name: new RegExp(deleteTestTitle) })).not.toBeVisible();
   });
 });
